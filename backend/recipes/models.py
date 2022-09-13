@@ -10,7 +10,7 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Название'
     )
-    colour = models.CharField(max_length=200, unique=True, verbose_name='Цвет')
+    color = models.CharField(max_length=7, unique=True, verbose_name='Цвет')
     slug = models.SlugField(unique=True, verbose_name='Относительный URL')
 
     def __str__(self) -> str:
@@ -78,7 +78,7 @@ class IngredientInRecipe(models.Model):
         related_name='amount',
         verbose_name='Рецепт'
     )
-    amount = models.PositiveIntegerField(verbose_name='Количество, кг')
+    amount = models.PositiveIntegerField(verbose_name='Количество')
 
 
 class ShoppingCart(models.Model):
@@ -107,20 +107,5 @@ class Favorite(models.Model):
         Recipe,
         related_name='favourites',
         verbose_name='Рецепт',
-        on_delete=models.CASCADE
-    )
-
-
-class Subscribe(models.Model):
-    user = models.ForeignKey(
-        User,
-        related_name='followers',
-        verbose_name='Подписчик',
-        on_delete=models.CASCADE
-    )
-    author = models.ForeignKey(
-        User,
-        related_name='followings',
-        verbose_name='Автор',
         on_delete=models.CASCADE
     )
