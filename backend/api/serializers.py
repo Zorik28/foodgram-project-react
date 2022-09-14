@@ -162,16 +162,9 @@ class FavoriteSerializer(ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class SubscriptionsRecipeSerializer(ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class SubscriptionsSerializer(ModelSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
-    recipes = SubscriptionsRecipeSerializer(read_only=True, many=True)
+    recipes = FavoriteSerializer(read_only=True, many=True)
     recipes_count = IntegerField(source='recipes.count', read_only=True)
 
     class Meta:
@@ -202,3 +195,10 @@ class SubscribeSerializer(ModelSerializer):
         request = self.context.get('request')
         context = {'request': request}
         return SubscriptionsSerializer(instance.author, context=context).data
+
+
+class ShoppingCartSerializer(FavoriteSerializer):
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('id', 'name', 'image', 'cooking_time')
