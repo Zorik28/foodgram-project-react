@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -31,6 +32,12 @@ class Ingredient(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'], name='ingredient')
+        ]
+
 
 class Recipe(models.Model):
     tags = models.ManyToManyField(
@@ -58,11 +65,18 @@ class Recipe(models.Model):
                               verbose_name='Ссылка на картинку')
     text = models.TextField(verbose_name='Описание')
     cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления (минуты)'
+        verbose_name='Время приготовления (минуты)',
+        validators=[MinValueValidator(1, 'Не может быть меньше 1 минуты')]
     )
 
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'name'], name='unique_author_recipe')
+        ]
 
 
 class IngredientInRecipe(models.Model):
@@ -78,7 +92,17 @@ class IngredientInRecipe(models.Model):
         related_name='amount',
         verbose_name='Рецепт'
     )
-    amount = models.PositiveIntegerField(verbose_name='Количество')
+    amount = models.PositiveIntegerField(
+        verbose_name='Количество',
+        validators=[MinValueValidator(1, 'Не может быть меньше 1')]
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_ingredient_in_recipe')
+        ]
 
 
 class ShoppingCart(models.Model):
@@ -95,6 +119,13 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_recipe_in_shoppingCart')
+        ]
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
@@ -109,3 +140,9 @@ class Favorite(models.Model):
         verbose_name='Рецепт',
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_favorites')
+        ]

@@ -1,23 +1,18 @@
-from django.contrib.auth import get_user_model
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from users.models import Subscribe
 
+from .mixins import CreateDestroyViewSet, User
 from .serializers import (CustomUserSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeCreateSerializer,
                           RecipeObtainSerializer, ShoppingCartSerializer,
                           SubscribeSerializer, SubscriptionsSerializer,
                           TagSerializer)
-
-User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
@@ -46,7 +41,11 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeCreateSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'get':
+            return RecipeObtainSerializer
+        return RecipeCreateSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -70,49 +69,13 @@ class RecipeViewSet(ModelViewSet):
         return response
 
 
-class FavoriteViewSet(ModelViewSet):
+class FavoriteViewSet(CreateDestroyViewSet):
     serializer_class = FavoriteSerializer
 
-    def perform_create(self, serializer):
-        recipe_id = self.kwargs.get('recipe_id')
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        serializer.save(user=self.request.user, recipe=recipe)
 
-    @action(methods=['delete'], detail=True)
-    def delete(self, request, recipe_id):
-        get_object_or_404(
-            Favorite, user=request.user, recipe=recipe_id
-        ).delete()
-        return Response(status=HTTP_204_NO_CONTENT)
-
-
-class SubscribeViewSet(ModelViewSet):
+class SubscribeViewSet(CreateDestroyViewSet):
     serializer_class = SubscribeSerializer
 
-    def perform_create(self, serializer):
-        user_id = self.kwargs.get('user_id')
-        user = get_object_or_404(User, pk=user_id)
-        serializer.save(user=self.request.user, author=user)
 
-    @action(methods=['delete'], detail=True)
-    def delete(self, request, user_id):
-        get_object_or_404(
-            Subscribe, user=request.user, author=user_id
-        ).delete()
-        return Response(status=HTTP_204_NO_CONTENT)
-
-
-class ShoppingCartModelViewSet(ModelViewSet):
+class ShoppingCartModelViewSet(CreateDestroyViewSet):
     serializer_class = ShoppingCartSerializer
-
-    def perform_create(self, serializer):
-        recipe_id = self.kwargs.get('recipe_id')
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        serializer.save(user=self.request.user, recipe=recipe)
-
-    @action(methods=['delete'], detail=True)
-    def delete(self, request, recipe_id):
-        get_object_or_404(
-            ShoppingCart, user=request.user, recipe=recipe_id
-        ).delete()
-        return Response(status=HTTP_204_NO_CONTENT)

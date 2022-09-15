@@ -16,16 +16,16 @@ router.register(
     FavoriteViewSet,
     basename='favorites'
 )
-router.register('users', CustomUserViewSet)
-router.register(
-    r'users/(?P<user_id>\d+)/subscribe',
-    SubscribeViewSet,
-    basename='subscribes'
-)
 router.register(
     r'recipes/(?P<recipe_id>\d+)/shopping_cart',
     ShoppingCartModelViewSet,
     basename='shopping_carts'
+)
+router.register('users', CustomUserViewSet)
+router.register(
+    r'users/(?P<author_id>\d+)/subscribe',
+    SubscribeViewSet,
+    basename='subscribes'
 )
 
 
