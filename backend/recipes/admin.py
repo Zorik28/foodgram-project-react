@@ -15,11 +15,12 @@ class IngredientAdmin(admin.ModelAdmin):
 
 class IngredientInRecipeInline(admin.TabularInline):
     model = IngredientInRecipe
+    extra = 1
 
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author',)
-    list_filter = ('name', 'author', 'tags',)
+    list_filter = ('author', 'name', 'tags',)
     readonly_fields = ('count_favourites',)
     inlines = [IngredientInRecipeInline]
 

@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 User = get_user_model()
@@ -12,7 +12,14 @@ class Tag(models.Model):
         verbose_name='Название'
     )
     color = models.CharField(max_length=7, unique=True, verbose_name='Цвет')
-    slug = models.SlugField(unique=True, verbose_name='Относительный URL')
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Относительный URL',
+        validators=[RegexValidator(
+            regex=r'^[-a-zA-Z0-9_]+$',
+            message='Введите корректный URL',
+            code='invalid_slug'
+        )])
 
     def __str__(self) -> str:
         return self.name
@@ -31,12 +38,6 @@ class Ingredient(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'measurement_unit'], name='ingredient')
-        ]
 
 
 class Recipe(models.Model):
@@ -71,12 +72,6 @@ class Recipe(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'name'], name='unique_author_recipe')
-        ]
 
 
 class IngredientInRecipe(models.Model):
@@ -123,7 +118,7 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name='unique_recipe_in_shoppingCart')
+                name='unique_recipe_in_shoppingcart')
         ]
 
 
@@ -144,5 +139,6 @@ class Favorite(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'], name='unique_favorites')
+                fields=['user', 'recipe'],
+                name='unique_favorite')
         ]

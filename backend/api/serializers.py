@@ -6,8 +6,10 @@ from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
 from rest_framework.serializers import (IntegerField, ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         SerializerMethodField,
-                                        StringRelatedField)
+                                        StringRelatedField, ValidationError)
 from users.models import Subscribe
+
+from .get_fields import get_items, is_subscribed, pop_items
 
 User = get_user_model()
 
@@ -23,12 +25,7 @@ class CustomUserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        return Subscribe.objects.filter(
-            user=request.user, author=obj.id
-        ).exists()
+        return is_subscribed(self, obj)
 
 
 class TagSerializer(ModelSerializer):
@@ -113,37 +110,30 @@ class RecipeCreateSerializer(ModelSerializer):
             'name', 'image', 'text', 'cooking_time',
         )
 
+    def validate(self, data):
+        unique_ingredients = []
+        for ingredient in data.get('ingredients'):
+            if ingredient['id'] in unique_ingredients:
+                raise ValidationError({
+                    'ingredients': 'Ингредиенты не должны повторяться'
+                })
+            unique_ingredients.append(ingredient['id'])
+
+        if not data.get('tags'):
+            raise ValidationError({'tags': 'Выберите тэг'})
+        return data
+
     def create(self, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
+        tags, ingredients = pop_items(validated_data)
         recipe = Recipe.objects.create(**validated_data)
-        IngredientInRecipe.objects.bulk_create([
-                IngredientInRecipe(
-                    recipe=recipe,
-                    ingredient=ingredient['id'],
-                    amount=ingredient['amount']
-                )
-                for ingredient in ingredients
-            ])
-        for tag in tags:
-            recipe.tags.add(tag)
+        get_items(recipe, ingredients, tags)
         return recipe
 
     def update(self, recipe, validated_data):
         recipe.tags.clear()
         IngredientInRecipe.objects.filter(recipe=recipe).delete()
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        IngredientInRecipe.objects.bulk_create([
-            IngredientInRecipe(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            )
-            for ingredient in ingredients
-        ])
-        for tag in tags:
-            recipe.tags.add(tag)
+        tags, ingredients = pop_items(validated_data)
+        get_items(recipe, ingredients, tags)
         return super().update(recipe, validated_data)
 
     def to_representation(self, instance):
@@ -162,9 +152,16 @@ class FavoriteSerializer(ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
+class SubscriptionsRecipeSerializer(ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
 class SubscriptionsSerializer(ModelSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
-    recipes = FavoriteSerializer(read_only=True, many=True)
+    recipes = SerializerMethodField(read_only=True)
     recipes_count = IntegerField(source='recipes.count', read_only=True)
 
     class Meta:
@@ -175,12 +172,14 @@ class SubscriptionsSerializer(ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
+        return is_subscribed(self, obj)
+
+    def get_recipes(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(
-            user=request.user, author=obj.id
-        ).exists()
+        queryset = Recipe.objects.filter(author=obj)
+        return SubscriptionsRecipeSerializer(queryset, many=True).data
 
 
 class SubscribeSerializer(ModelSerializer):
@@ -192,8 +191,7 @@ class SubscribeSerializer(ModelSerializer):
         fields = ('user', 'author')
 
     def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
+        context = {'request': self.context.get('request')}
         return SubscriptionsSerializer(instance.author, context=context).data
 
 
