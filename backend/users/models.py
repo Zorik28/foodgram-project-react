@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
         max_length=150,
         unique=True,
         validators=[RegexValidator(
-            regex=r'^[\w.@+-]+',
+            regex=r'^[\w.@+-]+\Z',
             message='Введите корректный username',
             code='invalid_username'
         )])

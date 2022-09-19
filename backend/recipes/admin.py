@@ -5,7 +5,7 @@ from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug',)
+    list_display = ('id', 'name', 'color', 'slug',)
 
 
 class IngredientAdmin(admin.ModelAdmin):

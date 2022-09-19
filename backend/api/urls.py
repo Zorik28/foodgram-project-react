@@ -3,7 +3,7 @@ from djoser.views import TokenCreateView, TokenDestroyView
 from rest_framework.routers import DefaultRouter
 
 from .views import (CustomUserViewSet, FavoriteViewSet, IngredientViewSet,
-                    RecipeViewSet, ShoppingCartModelViewSet, SubscribeViewSet,
+                    RecipeViewSet, ShoppingCartViewSet, SubscribeViewSet,
                     TagViewSet)
 
 router = DefaultRouter()
@@ -18,7 +18,7 @@ router.register(
 )
 router.register(
     r'recipes/(?P<recipe_id>\d+)/shopping_cart',
-    ShoppingCartModelViewSet,
+    ShoppingCartViewSet,
     basename='shopping_carts'
 )
 router.register('users', CustomUserViewSet)

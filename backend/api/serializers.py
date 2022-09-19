@@ -178,7 +178,10 @@ class SubscriptionsSerializer(ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
+        recipes_limit = request.query_params.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj)
+        if recipes_limit:
+            queryset = queryset[:int(recipes_limit)]
         return SubscriptionsRecipeSerializer(queryset, many=True).data
 
 
