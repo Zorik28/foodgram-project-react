@@ -24,6 +24,10 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
 
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
 
 class Subscribe(Model):
     User = get_user_model()
@@ -41,9 +45,14 @@ class Subscribe(Model):
     )
 
     class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         constraints = [
             UniqueConstraint(
                 fields=['user', 'author'], name='unique_follow'),
             CheckConstraint(
                 check=~Q(user=F('author')), name='not_follow_yourself')
         ]
+
+    def __str__(self) -> str:
+        return f'{self.user} follows {self.author}'

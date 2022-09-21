@@ -9,4 +9,4 @@ class Process500:
         return self._get_response(request)
 
     def process_exception(self, request, exception):
-        return JsonResponse({"success": False, "error": str(exception)})
+        return JsonResponse({'success': False, 'error': str(exception)})

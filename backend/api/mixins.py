@@ -1,39 +1,87 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from recipes.models import Recipe
-from rest_framework.decorators import action
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.serializers import ModelSerializer
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from rest_framework.viewsets import ModelViewSet
 
-User = get_user_model()
+from recipes.models import IngredientInRecipe, Recipe
+from users.models import Subscribe
 
 
-class CreateDestroyViewSet(CreateModelMixin, DestroyModelMixin,
-                           GenericViewSet):
+class CreateDestroy(ModelViewSet):
+    '''Вьюсет, содержащий методы для создания и удаления экземпляров класса.'''
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        if self.kwargs.get('author_id'):
-            author = get_object_or_404(User, pk=self.kwargs.get('author_id'))
-            serializer.save(user=user, author=author)
-        else:
-            recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
-            serializer.save(user=user, recipe=recipe)
+    @staticmethod
+    def post_method_for_actions(request, pk, serializers):
+        data = {'user': request.user.id, 'recipe': pk}
+        serializer = serializers(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
 
-    @action(methods=['delete'], detail=True)
-    def delete(self, request, recipe_id=None, author_id=None):
-        if author_id:
-            get_object_or_404(
-                self.serializer_class.Meta.model,
-                author=author_id,
-                user=request.user,
-            ).delete()
-            return Response(status=HTTP_204_NO_CONTENT)
-        get_object_or_404(
-            self.serializer_class.Meta.model,
-            recipe=recipe_id,
-            user=request.user,
-        ).delete()
+    @staticmethod
+    def delete_method_for_actions(request, pk, model):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        model_obj = get_object_or_404(model, user=user, recipe=recipe)
+        model_obj.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class IsSubscribed():
+    '''Класс добавляющий в сериализатор дополнительное поле,
+    отображающее наличие подписки на автора'''
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        return Subscribe.objects.filter(
+            user=request.user, author=obj.id
+        ).exists()
+
+
+class CreatePopItems():
+    '''Вспомогательный класс для сериализатора.
+    Задаёт методы создания и изменения рецептов'''
+
+    @staticmethod
+    def create_ingredients(recipe, ingredients):
+        IngredientInRecipe.objects.bulk_create([
+                IngredientInRecipe(
+                    recipe=recipe,
+                    ingredient=ingredient['id'],
+                    amount=ingredient['amount']
+                )
+                for ingredient in ingredients
+            ])
+
+    @staticmethod
+    def create_tags(recipe, tags):
+        for tag in tags:
+            recipe.tags.add(tag)
+
+    @staticmethod
+    def pop_items(validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        return tags, ingredients
+
+
+class RepresentationSerializer(ModelSerializer):
+    '''Сериализатор с переопределённым методом to_representation'''
+
+    def to_representation(self, instance):
+        from .serializers import (
+            RecipeObtainSerializer, RecipeSerializer,
+            SubscriptionsSerializer
+        )
+        context = {'request': self.context.get('request')}
+        if isinstance(instance, Subscribe):
+            return SubscriptionsSerializer(
+                instance.author, context=context).data
+        if isinstance(instance, Recipe):
+            return RecipeObtainSerializer(
+                instance=instance, context=context).data
+        return RecipeSerializer(
+            instance.recipe, context=context).data

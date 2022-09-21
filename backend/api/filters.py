@@ -1,12 +1,26 @@
-from django_filters.rest_framework import FilterSet
-from django_filters.rest_framework import filters as f
-from recipes.models import Recipe, Tag
+from django_filters.rest_framework import FilterSet, filters
+
+from recipes.models import Ingredient, Recipe, Tag
+
+
+class IngredientFilter(FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='startswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
 
 
 class RecipeFilter(FilterSet):
-    is_favorited = f.BooleanFilter(method='filter_is_favorited')
-    is_in_shopping_cart = f.BooleanFilter(method='filter_is_in_shopping_cart')
-    tags = f.ModelMultipleChoiceFilter(
+    author = filters.NumberFilter(
+        field_name='author__id',
+        lookup_expr='exact'
+    )
+    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_is_in_shopping_cart'
+    )
+    tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
         queryset=Tag.objects.all()
