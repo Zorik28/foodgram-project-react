@@ -94,22 +94,22 @@ class RecipeViewSet(CreateDestroy):
 
     @action(detail=True, methods=["POST"])
     def favorite(self, request, pk):
-        return self.post_method_for_actions(
+        return self._post_method_for_actions(
             request=request, pk=pk, serializers=FavoriteSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_method_for_actions(
+        return self._delete_method_for_actions(
             request=request, pk=pk, model=Favorite)
 
     @action(detail=True, methods=["POST"])
     def shopping_cart(self, request, pk):
-        return self.post_method_for_actions(
+        return self._post_method_for_actions(
             request=request, pk=pk, serializers=ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
-        return self.delete_method_for_actions(
+        return self._delete_method_for_actions(
             request=request, pk=pk, model=ShoppingCart)
 
     @action(detail=False, permission_classes=[IsAuthenticated])

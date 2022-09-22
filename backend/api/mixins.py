@@ -13,22 +13,14 @@ from users.models import Subscribe
 class CreateDestroy(ModelViewSet):
     """Вьюсет, содержащий методы для создания и удаления экземпляров класса."""
 
-    def post_method_for_actions(self, request, pk, serializers):
-        return self.__post_method_for_actions(request, pk, serializers)
-
-    def delete_method_for_actions(self, request, pk, model):
-        return self.__delete_method_for_actions(request, pk, model)
-
-    @staticmethod
-    def __post_method_for_actions(request, pk, serializers):
+    def _post_method_for_actions(self, request, pk, serializers):
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializers(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
-    @staticmethod
-    def __delete_method_for_actions(request, pk, model):
+    def _delete_method_for_actions(request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         model_obj = model.objects.filter(user=user, recipe=recipe)
@@ -39,7 +31,7 @@ class CreateDestroy(ModelViewSet):
             {'error': 'Этого рецепта нет у вас'}, status=HTTP_400_BAD_REQUEST)
 
 
-class IsSubscribed():
+class IsSubscribed:
     """Класс добавляющий в сериализатор дополнительное поле,
     отображающее наличие подписки на автора."""
 
@@ -52,7 +44,7 @@ class IsSubscribed():
         ).exists()
 
 
-class CreatePopItems():
+class CreatePopItems:
     """Вспомогательный класс для сериализатора.
     Задаёт методы создания и изменения рецептов."""
 

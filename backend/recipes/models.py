@@ -115,7 +115,7 @@ class IngredientInRecipe(models.Model):
         ]
 
     def __str__(self):
-        return f'Ингридиент {self.ingredient} рецепта {self.recipe.name}'
+        return f'Ингредиент {self.ingredient} рецепта {self.recipe.name}'
 
 
 class Favorite(models.Model):
