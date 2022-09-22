@@ -47,6 +47,8 @@ jobs:
           push: true
           context: ./backend
           tags: ${{ secrets.DOCKER_USERNAME }}/footgram:latest
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2 
         with:
           push: true
           context: ./frontend
@@ -91,4 +93,3 @@ jobs:
   #       to: ${{ secrets.TELEGRAM_TO }}
   #       token: ${{ secrets.TELEGRAM_TOKEN }}
   #       message: ${{ github.workflow }} успешно выполнен!
-  
