@@ -4,7 +4,8 @@ from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from rest_framework.status import (
+    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from recipes.models import (
@@ -32,6 +33,7 @@ class CustomUserViewSet(UserViewSet):
         ['post', 'delete'], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
         user = request.user
+        author = get_object_or_404(User, id=id)
         if request.method == 'POST':
             data = {'user': user.id, 'author': id}
             serializer = SubscribeSerializer(
@@ -41,10 +43,14 @@ class CustomUserViewSet(UserViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
-        author = get_object_or_404(User, id=id)
-        follow = get_object_or_404(Subscribe, user=user, author=author)
-        follow.delete()
-        return Response(status=HTTP_204_NO_CONTENT)
+        follow = Subscribe.objects.filter(user=user, author=author)
+        if follow.exists():
+            follow.delete()
+            return Response(status=HTTP_204_NO_CONTENT)
+        return Response(
+            {'error': 'Вы не подписаны на этого автора'},
+            status=HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
