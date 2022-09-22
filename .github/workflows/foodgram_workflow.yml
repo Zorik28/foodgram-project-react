@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: | 
         # обновление pip
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip
         # установка flake8 и его плагинов
         pip install flake8 pep8-naming flake8-broken-line flake8-return
         # установка зависимостей
@@ -46,7 +46,11 @@ jobs:
         with:
           push: true
           context: ./backend
-          tags: ${{ secrets.DOCKER_USERNAME }}/footgram_final:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/footgram:latest
+        with:
+          push: true
+          context: ./frontend
+          tags: ${{ secrets.DOCKER_USERNAME }}/footgram_frontend:latest
 
   # deploy:
   #   runs-on: ubuntu-latest
