@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from rest_framework.status import (
-    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
-)
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
+                                   HTTP_400_BAD_REQUEST)
 from rest_framework.viewsets import ModelViewSet
 
 from recipes.models import IngredientInRecipe, Recipe
@@ -20,7 +19,7 @@ class CreateDestroy(ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
-    def _delete_method_for_actions(request, pk, model):
+    def _delete_method_for_actions(self, request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         model_obj = model.objects.filter(user=user, recipe=recipe)
@@ -51,13 +50,11 @@ class CreatePopItems:
     @staticmethod
     def create_ingredients(recipe, ingredients):
         IngredientInRecipe.objects.bulk_create([
-                IngredientInRecipe(
-                    recipe=recipe,
-                    ingredient=ingredient['id'],
-                    amount=ingredient['amount']
-                )
-                for ingredient in ingredients
-            ])
+            IngredientInRecipe(
+                recipe=recipe,
+                ingredient=ingredient['id'],
+                amount=ingredient['amount']
+            ) for ingredient in ingredients])
 
     @staticmethod
     def create_tags(recipe, tags):
@@ -75,10 +72,8 @@ class RepresentationMixin(ModelSerializer):
     """Сериализатор с переопределённым методом to_representation."""
 
     def to_representation(self, instance):
-        from .serializers import (
-            RecipeObtainSerializer, RecipeSerializer,
-            SubscriptionsSerializer
-        )
+        from .serializers import (RecipeObtainSerializer, RecipeSerializer,
+                                  SubscriptionsSerializer)
         context = {'request': self.context.get('request')}
         if isinstance(instance, Subscribe):
             return SubscriptionsSerializer(
