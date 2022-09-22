@@ -11,9 +11,7 @@ from recipes.models import (
     Favorite, Ingredient, IngredientInRecipe, Recipe, ShoppingCart, Tag
 )
 from users.models import Subscribe
-from .mixins import (
-    CreatePopItems, IsSubscribed, RepresentationSerializer
-)
+from .mixins import (CreatePopItems, IsSubscribed, RepresentationMixin)
 
 User = get_user_model()
 
@@ -98,7 +96,7 @@ class IngredientInRecipeCreateSerializer(ModelSerializer):
         fields = ('id', 'amount',)
 
 
-class RecipeCreateSerializer(RepresentationSerializer, CreatePopItems):
+class RecipeCreateSerializer(RepresentationMixin, CreatePopItems):
     tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientInRecipeCreateSerializer(many=True)
@@ -147,14 +145,14 @@ class RecipeCreateSerializer(RepresentationSerializer, CreatePopItems):
 
 
 class RecipeSerializer(ModelSerializer):
-    '''Сериализатор для получения ограниченной версии модели "рецепт"'''
+    """Сериализатор для получения ограниченной версии модели Recipe."""
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class SubscribeSerializer(RepresentationSerializer):
+class SubscribeSerializer(RepresentationMixin):
 
     class Meta:
         model = Subscribe
@@ -176,7 +174,7 @@ class SubscribeSerializer(RepresentationSerializer):
 
 
 class SubscriptionsSerializer(ModelSerializer, IsSubscribed):
-    '''Сериализатор для отображения подписок'''
+    """Сериализатор для отображения подписок."""
 
     is_subscribed = SerializerMethodField(read_only=True)
     recipes = SerializerMethodField(read_only=True)
@@ -200,7 +198,7 @@ class SubscriptionsSerializer(ModelSerializer, IsSubscribed):
         return RecipeSerializer(queryset, many=True).data
 
 
-class FavoriteSerializer(RepresentationSerializer):
+class FavoriteSerializer(RepresentationMixin):
 
     class Meta:
         model = Favorite
@@ -214,7 +212,7 @@ class FavoriteSerializer(RepresentationSerializer):
         ]
 
 
-class ShoppingCartSerializer(RepresentationSerializer):
+class ShoppingCartSerializer(RepresentationMixin):
 
     class Meta:
         model = ShoppingCart

@@ -114,6 +114,9 @@ class IngredientInRecipe(models.Model):
                 name='unique_ingredient_in_recipe')
         ]
 
+    def __str__(self):
+        return f'Ингридиент {self.ingredient} рецепта {self.recipe.name}'
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
@@ -138,6 +141,9 @@ class Favorite(models.Model):
                 name='unique_favorite')
         ]
 
+    def __str__(self):
+        return f'Рецепт {self.recipe.name} в избранном у {self.user.name}'
+
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
@@ -161,3 +167,6 @@ class ShoppingCart(models.Model):
                 fields=['user', 'recipe'],
                 name='unique_recipe_in_shoppingcart')
         ]
+
+    def __str__(self):
+        return f'Рецепт {self.recipe.name} в списке покупок {self.user.name}'

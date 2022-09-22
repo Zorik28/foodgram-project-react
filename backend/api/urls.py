@@ -8,10 +8,10 @@ from .views import (
 
 router = DefaultRouter()
 
-router.register('users', CustomUserViewSet, 'user')
-router.register('tags', TagViewSet, 'tag')
-router.register('ingredients', IngredientViewSet, 'ingredient')
-router.register('recipes', RecipeViewSet, 'recipe')
+router.register('users', CustomUserViewSet, 'users')
+router.register('tags', TagViewSet, 'tags')
+router.register('ingredients', IngredientViewSet, 'ingredients')
+router.register('recipes', RecipeViewSet, 'recipes')
 
 urlpatterns = [
     path('auth/token/login/', TokenCreateView.as_view()),

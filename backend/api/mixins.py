@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.status import (
-    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
+    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
+)
 from rest_framework.viewsets import ModelViewSet
 
 from recipes.models import IngredientInRecipe, Recipe
@@ -10,10 +11,16 @@ from users.models import Subscribe
 
 
 class CreateDestroy(ModelViewSet):
-    '''Вьюсет, содержащий методы для создания и удаления экземпляров класса.'''
+    """Вьюсет, содержащий методы для создания и удаления экземпляров класса."""
+
+    def post_method_for_actions(self, request, pk, serializers):
+        return self.__post_method_for_actions(request, pk, serializers)
+
+    def delete_method_for_actions(self, request, pk, model):
+        return self.__delete_method_for_actions(request, pk, model)
 
     @staticmethod
-    def post_method_for_actions(request, pk, serializers):
+    def __post_method_for_actions(request, pk, serializers):
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializers(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -21,7 +28,7 @@ class CreateDestroy(ModelViewSet):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     @staticmethod
-    def delete_method_for_actions(request, pk, model):
+    def __delete_method_for_actions(request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         model_obj = model.objects.filter(user=user, recipe=recipe)
@@ -33,8 +40,8 @@ class CreateDestroy(ModelViewSet):
 
 
 class IsSubscribed():
-    '''Класс добавляющий в сериализатор дополнительное поле,
-    отображающее наличие подписки на автора'''
+    """Класс добавляющий в сериализатор дополнительное поле,
+    отображающее наличие подписки на автора."""
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -46,8 +53,8 @@ class IsSubscribed():
 
 
 class CreatePopItems():
-    '''Вспомогательный класс для сериализатора.
-    Задаёт методы создания и изменения рецептов'''
+    """Вспомогательный класс для сериализатора.
+    Задаёт методы создания и изменения рецептов."""
 
     @staticmethod
     def create_ingredients(recipe, ingredients):
@@ -72,8 +79,8 @@ class CreatePopItems():
         return tags, ingredients
 
 
-class RepresentationSerializer(ModelSerializer):
-    '''Сериализатор с переопределённым методом to_representation'''
+class RepresentationMixin(ModelSerializer):
+    """Сериализатор с переопределённым методом to_representation."""
 
     def to_representation(self, instance):
         from .serializers import (

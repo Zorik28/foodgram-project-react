@@ -5,7 +5,7 @@ AMOUNT = 2
 MEASUREMENT_UNIT = 1
 
 
-def create_text(ingredients):
+def create_shopping_cart_txt(ingredients):
     purchases = []
     for item in ingredients:
         purchases.append(

@@ -5,7 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
-    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
+    HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
+)
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from recipes.models import (
@@ -21,7 +22,7 @@ from .serializers import (
     RecipeCreateSerializer, RecipeObtainSerializer, ShoppingCartSerializer,
     SubscribeSerializer, SubscriptionsSerializer, TagSerializer, User
 )
-from .services import create_text
+from .services import create_shopping_cart_txt
 
 
 class CustomUserViewSet(UserViewSet):
@@ -54,7 +55,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        user = self.request.user
+        user = request.user
         queryset = get_list_or_404(User, followings__user=user)
         pages = self.paginate_queryset(queryset)
         serializer = SubscriptionsSerializer(
@@ -74,7 +75,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
     filterset_class = IngredientFilter
-    search_fields = ('^name',)
 
 
 class RecipeViewSet(CreateDestroy):
@@ -122,4 +122,4 @@ class RecipeViewSet(CreateDestroy):
             .values_list('ingredient__name', 'ingredient__measurement_unit')
             .annotate(Sum('amount'))
         )
-        return create_text(ingredients)
+        return create_shopping_cart_txt(ingredients)

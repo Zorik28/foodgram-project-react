@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
-from django.db.models import (CASCADE, CharField, CheckConstraint, EmailField,
-                              F, ForeignKey, Model, Q, UniqueConstraint)
+from django.db.models import (
+    CASCADE, CharField, CheckConstraint, EmailField, F, ForeignKey, Model, Q,
+    UniqueConstraint
+)
 
 
 class CustomUser(AbstractUser):
@@ -27,6 +29,9 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def __str__(self) -> str:
+        return self.email
 
 
 class Subscribe(Model):
