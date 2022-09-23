@@ -69,7 +69,7 @@ jobs:
         script: |
           # Остановка контейнеров
           sudo docker-compose stop
-          # Удаление контейнера web
+          # Удаление контейнера backend
           sudo docker-compose rm backend
           # Создание файла с переменными окружения
           touch .env
