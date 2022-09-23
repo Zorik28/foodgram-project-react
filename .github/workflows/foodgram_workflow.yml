@@ -68,9 +68,9 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           # Остановка контейнеров
-          sudo docker compose stop
+          sudo docker-compose stop
           # Удаление контейнера web
-          sudo docker compose rm backend
+          sudo docker-compose rm backend
           # Создание файла с переменными окружения
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
