@@ -1,6 +1,0 @@
-venv
-.env.
-.vscode
-tests
-pytest.ini
-setup.cfg
