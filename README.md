@@ -2,7 +2,8 @@
 
 Проект Foodgram реализован для обмена рецептами. Авторизованные пользователи
 могут публиковать свои рецепты, подписываться на понравившихся авторов, добавлять рецепты в избранное,
-составлять список покупок и скачивать его себе в формате pdf.
+составлять список покупок и скачивать его себе в формате txt.
+
 
 ## Описание Workflow
 ### Workflow состоит из четырёх шагов:
@@ -16,10 +17,7 @@
 - Отправка уведомления в телеграм-чат.
 
 ## Подготовка и запуск проекта
-### Склонировать репозиторий на локальную машину:
-```
-git clone https://github.com/JediMode/foodgram-project-react
-```
+
 ## Для работы с удаленным сервером (на ubuntu):
 * Выполните вход на свой удаленный сервер
 
@@ -36,15 +34,15 @@ sudo chmod +x /usr/local/bin/docker-compose
 * Скопируйте файлы docker-compose.yml и nginx.conf из директории infra на сервер:
 ```
 scp docker-compose.yml <username>@<host>:/home/<username>/docker-compose.yml
-scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
+scp nginx/nginx.conf <username>@<host>:/home/<username>/nginx/nginx.conf
 ```
 
 * Cоздайте .env файл и впишите:
     ```
     DB_ENGINE=<django.db.backends.postgresql>
     DB_NAME=<имя базы данных postgres>
-    DB_USER=<пользователь бд>
-    DB_PASSWORD=<пароль>
+    POSTGRES_USER=<пользователь бд>
+    POSTGRES_PASSWORD=<пароль>
     DB_HOST=<db>
     DB_PORT=<5432>
     SECRET_KEY=<секретный ключ проекта django>
@@ -72,24 +70,26 @@ sudo docker-compose up -d --build
 * После успешной сборки на сервере выполните команды (только после первого деплоя):
     - Соберите статические файлы:
     ```
-    sudo docker-compose exec web python manage.py collectstatic --noinput
+    sudo docker-compose exec backend python manage.py collectstatic --noinput
     ```
     - Примените миграции:
     ```
-    sudo docker-compose exec web python manage.py migrate --noinput
+    sudo docker-compose exec backend python manage.py migrate --noinput
     ```
     - Загрузите ингридиенты  в базу данных:  
     ```
-    sudo docker-compose exec web python manage.py load_data
+    sudo docker-compose exec backend python manage.py load_data
     ```
     - Создать суперпользователя Django:
     ```
-    sudo docker-compose exec web python manage.py createsuperuser
+    sudo docker-compose exec backend python manage.py createsuperuser
     ```
     - Проект будет доступен по вашему IP
 
 ## Проект в интернете
-Проект запущен и доступен по адресу (http://158.160.7.15/recipes)
+Проект запущен и доступен по адресу ()
+
+
 
 #### Автор
 Карапетян Зорик  
