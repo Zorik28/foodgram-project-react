@@ -71,6 +71,7 @@ jobs:
           sudo docker-compose stop
           # Удаление контейнера backend
           sudo docker-compose rm backend
+          sudo docker-compose rm db
           # Создание файла с переменными окружения
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
@@ -82,6 +83,7 @@ jobs:
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
           # Запуск контейнеров
           sudo docker-compose up -d
+          sudo docker-compose -T exec backend python manage.py makemigrations --noinput
           sudo docker-compose -T exec backend python manage.py migrate --noinput
           sudo docker-compose exec -T backend python manage.py collectstatic --no-input
   
