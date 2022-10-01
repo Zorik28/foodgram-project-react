@@ -89,7 +89,7 @@ class RecipeObtainSerializer(ModelSerializer):
 
 class IngredientInRecipeCreateSerializer(ModelSerializer):
     id = PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = IntegerField()
+    amount = IntegerField(min_value=1)
 
     class Meta:
         model = IngredientInRecipe
@@ -117,11 +117,6 @@ class RecipeCreateSerializer(RepresentationMixin, CreatePopItems):
                     'ingredients': 'Ингредиенты не должны повторяться'
                 })
             unique_ingredients.append(ingredient['id'])
-
-            if int(ingredient['amount']) <= 1:
-                raise ValidationError({
-                    'amount': 'Количество должно быть больше или равно 1'
-                })
 
         tags = data.get('tags')
         if not tags:
