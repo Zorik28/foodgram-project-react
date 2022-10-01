@@ -118,7 +118,7 @@ class RecipeCreateSerializer(RepresentationMixin, CreatePopItems):
                 })
             unique_ingredients.append(ingredient['id'])
 
-            if ingredient['amount'] <= 1:
+            if int(ingredient['amount']) <= 1:
                 raise ValidationError({
                     'amount': 'Количество должно быть больше или равно 1'
                 })
