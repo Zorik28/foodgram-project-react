@@ -1,16 +1,16 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        PrimaryKeyRelatedField,
-                                        SerializerMethodField,
-                                        StringRelatedField, ValidationError)
+from rest_framework.serializers import (
+    IntegerField, ModelSerializer, PrimaryKeyRelatedField,
+    SerializerMethodField, StringRelatedField, ValidationError
+)
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import (
+    Favorite, Ingredient, IngredientInRecipe, Recipe, ShoppingCart, Tag
+)
 from users.models import Subscribe
-
 from .mixins import CreatePopItems, IsSubscribed, RepresentationMixin
 
 User = get_user_model()
