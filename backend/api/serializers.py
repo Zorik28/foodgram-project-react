@@ -120,7 +120,7 @@ class RecipeCreateSerializer(RepresentationMixin, CreatePopItems):
 
             if ingredient['amount'] <= 1:
                 raise ValidationError({
-                    'amount': 'Количество ингредиента должно быть больше или равно 1'
+                    'amount': 'Количество должно быть больше или равно 1'
                 })
 
         tags = data.get('tags')
