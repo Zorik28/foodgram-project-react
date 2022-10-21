@@ -86,8 +86,6 @@ sudo docker-compose up -d --build
     ```
     - The project will be available by your IP
 
-The project is run and available at (http://84.201.153.239/recipes)
-
 
 #### Author
 Karapetyan Zorik   
