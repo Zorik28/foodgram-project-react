@@ -1,96 +1,94 @@
 # Foodgram 
 
-Проект Foodgram реализован для обмена рецептами. Авторизованные пользователи
-могут публиковать свои рецепты, подписываться на понравившихся авторов, добавлять рецепты в избранное,
-составлять список покупок и скачивать его себе в формате txt
+The Foodgram project is implemented to share recipes.
+Authorized users can publish their recipes, subscribe to the authors they like,
+add recipes to favorites, make a shopping list and download it to themselves in txt format.
 
 
-## Описание Workflow
-### Workflow состоит из четырёх шагов:
+## Description of Workflow
+### Workflow consists of four steps:
 #### tests
-- Проверка кода на соответствие PEP8.
-#### push Docker image to Docker Hub
-- Сборка и публикация образа на DockerHub.
+- Checking the code for compliance with PEP8.
+#### push Docker image to DockerHub
+- Building and publishing the image on DockerHub.
 #### deploy 
-- Автоматический деплой на боевой сервер при пуше в главную ветку.
+- Automatic deployment to the production server when pushing to the main branch.
 #### send_massage
-- Отправка уведомления в телеграм-чат.
+- Sending a notification to a telegram chat.
 
-## Подготовка и запуск проекта
+## Preparation and project launch
 
-## Для работы с удаленным сервером (на ubuntu):
-* Выполните вход на свой удаленный сервер
+## To work with a remote server (on ubuntu):
+* Log in to your remote server
 
-* Установите docker на сервер:
+* Install docker:
 ```
 sudo apt install docker.io 
 ```
-* Установите docker-compose на сервер:
+* Install docker-compose:
 ```
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 ```
-* Локально отредактируйте файл infra/nginx.conf и в строке server_name впишите свой IP
-* Скопируйте файлы docker-compose.yml и nginx.conf из директории infra на сервер:
+* Edit the infra/nginx/nginx.conf file locally and enter your IP in the server_name line
+* Copy the docker-compose.yml and nginx.conf files from the infra directory to the server:
 ```
 scp docker-compose.yml <username>@<host>:/home/<username>/docker-compose.yml
 scp nginx/nginx.conf <username>@<host>:/home/<username>/nginx/nginx.conf
 ```
 
-* Cоздайте .env файл и впишите:
+* Create an .env file and write the following:
     ```
     DB_ENGINE=<django.db.backends.postgresql>
-    DB_NAME=<имя базы данных postgres>
-    POSTGRES_USER=<пользователь бд>
-    POSTGRES_PASSWORD=<пароль>
+    DB_NAME=<postgres database name>
+    POSTGRES_USER=<database user>
+    POSTGRES_PASSWORD=<password>
     DB_HOST=<db>
     DB_PORT=<5432>
-    SECRET_KEY=<секретный ключ проекта django>
+    SECRET_KEY=<django project secret key>
     ```
-* Для работы с Workflow добавьте в Secrets GitHub переменные окружения для работы:
+* To work with Workflow, add environment variables to Secrets GitHub:
     ```
-    DOCKER_PASSWORD=<пароль от DockerHub>
-    DOCKER_USERNAME=<имя пользователя>
+    DOCKER_PASSWORD=<DockerHub password>
+    DOCKER_USERNAME=<username>
     
-    SECRET_KEY=<секретный ключ проекта django>
+    SECRET_KEY=<django project secret key>
 
-    USER=<username для подключения к серверу>
-    HOST=<IP сервера>
-    PASSPHRASE=<пароль для сервера, если он установлен>
-    SSH_KEY=<ваш SSH ключ (для получения команда: cat ~/.ssh/id_rsa)>
+    USER=<username to connect to the server>
+    HOST=<server IP>
+    PASSPHRASE=<password for the server, if set>
+    SSH_KEY=<your SSH key (to get: cat ~/.ssh/id_rsa)>
 
-    TELEGRAM_TO=<ID чата, в который придет сообщение>
-    TELEGRAM_TOKEN=<токен вашего бота>
+    TELEGRAM_TO=<chat ID where the message will be sent>
+    TELEGRAM_TOKEN=<your bot token>
     ```
   
-* На сервере соберите docker-compose:
+* Build docker-compose on the server:
 ```
 sudo docker-compose up -d --build
 ```
-* После успешной сборки на сервере выполните команды (только после первого деплоя):
-    - Соберите статические файлы:
+* After a successful build, run the commands (only after the first deployment):
+    - Collect static files:
     ```
     sudo docker-compose exec backend python manage.py collectstatic --noinput
     ```
-    - Примените миграции:
+    - Apply migrations:
     ```
     sudo docker-compose exec backend python manage.py migrate --noinput
     ```
-    - Загрузите ингридиенты  в базу данных:  
+    - Upload the ingredients to the database:  
     ```
     sudo docker-compose exec backend python manage.py loaddata data/ingredients.json
     ```
-    - Создать суперпользователя Django:
+    - Create superuser:
     ```
     sudo docker-compose exec backend python manage.py createsuperuser
     ```
-    - Проект будет доступен по вашему IP
+    - The project will be available by your IP
 
-## Проект в интернете
-Проект запущен и доступен по адресу (http://84.201.153.239/recipes)
-
+The project is run and available at (http://84.201.153.239/recipes)
 
 
-#### Автор
-Карапетян Зорик  
-РФ, Санкт-Петербург, Купчино.
+#### Author
+Karapetyan Zorik
+Russian Federation, St. Petersburg, Kupchino.
