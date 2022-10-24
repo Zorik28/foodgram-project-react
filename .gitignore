@@ -133,3 +133,4 @@ dmypy.json
 .vscode/
 
 media/
+postgres_db.sql
