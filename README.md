@@ -5,12 +5,12 @@ Authorized users can publish their recipes, subscribe to the authors they like,
 add recipes to favorites, make a shopping list and download it to themselves in txt format.
 
 ## Technologies
-Django 4.1
-django-filter 22.1
-djangorestframework 3.13.1
-djoser 2.1.0
-gunicorn 20.1.0
-Pillow 9.2.0
+- Django 4.1
+- django-filter 22.1
+- djangorestframework 3.13.1
+- djoser 2.1.0
+- gunicorn 20.1.0
+- Pillow 9.2.0
 
 ## Description of Workflow
 ### Workflow consists of four steps:
