@@ -13,7 +13,6 @@ add recipes to favorites, make a shopping list and download it to themselves in 
 - Pillow 9.2.0
 
 ## Description of Workflow
-### Workflow consists of four steps:
 #### tests
 - Checking the code for compliance with PEP8.
 #### push Docker image to DockerHub
@@ -25,7 +24,7 @@ add recipes to favorites, make a shopping list and download it to themselves in 
 
 ## Preparation and project launch
 
-## To work with a remote server (on ubuntu):
+### To work with a remote server (on ubuntu):
 * Log in to your remote server
 
 * Install docker:
