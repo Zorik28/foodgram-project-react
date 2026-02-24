@@ -5,7 +5,7 @@ djoser==2.3.0
 drf-extra-fields==3.4.0 
 flake8==5.0.4
 gunicorn==23.0.0
-Pillow==10.3.0
+Pillow==12.1.1
 psycopg2-binary==2.9.3
 pytest==7.1.2
 python-dotenv==0.21.0
